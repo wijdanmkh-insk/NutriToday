@@ -71,15 +71,14 @@ export default function Landing() {
   // ——— Landing Screen ———
   if (step === STEPS.LANDING) {
     return (
-      <div className="min-h-screen bg-brand-darkest flex flex-col items-center justify-between px-6 py-12">
+      <div className="h-screen bg-brand-darkest flex flex-row items-center justify-center px-16 py-12 gap-8">
         {/* Logo */}
-        <div className="flex items-center gap-2 text-white">
-          <Leaf size={28} className="text-brand-yellow" />
-          <span className="text-xl font-bold tracking-tight">NutriToday</span>
+        <div className="flex items-center gap-2 text-white w-96 h-96">
+          <img className="object-cover w-full h-full rounded-md" src="https://thumbs.dreamstime.com/b/man-eating-salad-handsome-bearded-white-t-shirt-tomatoes-kitchen-healthy-vegan-food-concept-85077376.jpg"></img>
         </div>
 
         {/* Hero */}
-        <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 py-12">
+        <div className="flex-1 flex flex-col items-start justify-center text-left gap-6 py-12">
           <div className="w-20 h-20 rounded-full bg-brand-dark flex items-center justify-center shadow-xl">
             <Leaf size={42} className="text-brand-yellow" />
           </div>
@@ -107,9 +106,8 @@ export default function Landing() {
               </li>
             ))}
           </ul>
-        </div>
 
-        {/* CTA */}
+          {/* CTA */}
         <button
           onClick={() => setStep(STEPS.FORM)}
           className="w-full max-w-xs bg-brand-yellow text-brand-darkest font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform"
@@ -117,6 +115,7 @@ export default function Landing() {
           Get Started
           <ChevronRight size={20} />
         </button>
+        </div>
       </div>
     );
   }
@@ -125,7 +124,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-brand-darkest flex flex-col">
       {/* Header */}
-      <div className="px-6 pt-10 pb-6">
+      <div className="px-6 pt-10 pb-6 global-padding">
         <div className="flex items-center gap-2 text-white mb-6">
           <Leaf size={22} className="text-brand-yellow" />
           <span className="font-bold tracking-tight">NutriToday</span>
@@ -152,7 +151,7 @@ export default function Landing() {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                placeholder="e.g. Wijdan"
+                placeholder="e.g. Diana"
                 className={`w-full pl-9 pr-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-brand-mid transition ${
                   errors.name ? 'border-red-400' : 'border-gray-200'
                 }`}

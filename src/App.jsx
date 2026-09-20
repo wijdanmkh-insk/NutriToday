@@ -35,7 +35,7 @@ export default function App() {
             profile ? (
               <Navigate to="/dashboard" replace />
             ) : (
-              <div className="max-w-lg mx-auto">
+              <div className="w-full mx-auto">
                 <Landing />
               </div>
             )
