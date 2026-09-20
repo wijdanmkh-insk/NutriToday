@@ -1,6 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+const MODEL_NAMES = (import.meta.env.VITE_GEMINI_MODELS)
+  .split(',')
+  .map((modelName) => modelName.trim())
+  .filter(Boolean);
 
 function getClient() {
   if (!API_KEY) {
@@ -9,18 +13,38 @@ function getClient() {
   return new GoogleGenerativeAI(API_KEY);
 }
 
-// Menggunakan nama model terbaru sesuai instruksi error
-const MODEL_NAME = 'gemini-3.6-flash';
+function isRetryableModelError(error) {
+  const message = error?.message || String(error);
+  return /\b(429|503)\b|high demand|overloaded|temporarily unavailable|resource exhausted/i.test(
+    message
+  );
+}
+
+async function withModelFallback(callback, generationConfig) {
+  const genAI = getClient();
+  let lastError;
+
+  for (const modelName of MODEL_NAMES) {
+    const model = genAI.getGenerativeModel({
+      model: modelName,
+      ...(generationConfig ? { generationConfig } : {}),
+    });
+
+    try {
+      return await callback(model, modelName);
+    } catch (error) {
+      lastError = error;
+      if (!isRetryableModelError(error) || modelName === MODEL_NAMES.at(-1)) {
+        throw error;
+      }
+      console.warn(`Model ${modelName} gagal, mencoba fallback berikutnya.`, error);
+    }
+  }
+
+  throw lastError;
+}
 
 export async function analyzeFoodImage(base64ImageData, mimeType = 'image/jpeg') {
-  const genAI = getClient();
-  const model = genAI.getGenerativeModel({
-    model: MODEL_NAME,
-    generationConfig: {
-      responseMimeType: 'application/json',
-    },
-  });
-
   const imagePart = {
     inlineData: {
       data: base64ImageData,
@@ -44,19 +68,14 @@ export async function analyzeFoodImage(base64ImageData, mimeType = 'image/jpeg')
   "healthNotes": "Brief health note or serving suggestion"
 }`;
 
-  const result = await model.generateContent([prompt, imagePart]);
+  const result = await withModelFallback(
+    (model) => model.generateContent([prompt, imagePart]),
+    { responseMimeType: 'application/json' }
+  );
   return JSON.parse(result.response.text());
 }
 
 export async function generateMealSuggestions(userProfile, mealType = 'all') {
-  const genAI = getClient();
-  const model = genAI.getGenerativeModel({
-    model: MODEL_NAME,
-    generationConfig: {
-      responseMimeType: 'application/json',
-    },
-  });
-
   const { name, age, gender, weight, height } = userProfile || {};
   const bmi = weight && height ? (weight / ((height / 100) ** 2)).toFixed(1) : 'unknown';
 
@@ -92,14 +111,14 @@ Respond with a JSON object with this exact structure:
   }
 }`;
 
-  const result = await model.generateContent(prompt);
+  const result = await withModelFallback(
+    (model) => model.generateContent(prompt),
+    { responseMimeType: 'application/json' }
+  );
   return JSON.parse(result.response.text());
 }
 
 export async function chatWithNutriBot(messages, userProfile) {
-  const genAI = getClient();
-  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
   const { age, gender, weight, height } = userProfile || {};
   const bmi = weight && height ? (weight / ((height / 100) ** 2)).toFixed(1) : 'unknown';
 
@@ -113,30 +132,24 @@ When suggesting recipes, format them clearly with ingredients and brief steps.`;
     parts: [{ text: m.content || m.text }],
   }));
 
-  const chat = model.startChat({
-    history: [
-      { role: 'user', parts: [{ text: systemContext }] },
-      { role: 'model', parts: [{ text: 'Understood! I am NutriBot, ready to help with nutrition advice.' }] },
-      ...history,
-    ],
-  });
-
   const lastMessage = messages[messages.length - 1];
   const lastContent = lastMessage.content || lastMessage.text;
-  
-  const result = await chat.sendMessage(lastContent);
+
+  const result = await withModelFallback((model) => {
+    const chat = model.startChat({
+      history: [
+        { role: 'user', parts: [{ text: systemContext }] },
+        { role: 'model', parts: [{ text: 'Understood! I am NutriBot, ready to help with nutrition advice.' }] },
+        ...history,
+      ],
+    });
+
+    return chat.sendMessage(lastContent);
+  });
   return result.response.text();
 }
 
 export async function generateFoodByCategory(category, userProfile) {
-  const genAI = getClient();
-  const model = genAI.getGenerativeModel({
-    model: MODEL_NAME,
-    generationConfig: {
-      responseMimeType: 'application/json',
-    },
-  });
-
   const { age, gender, weight, height } = userProfile || {};
   const bmi = weight && height ? (weight / ((height / 100) ** 2)).toFixed(1) : 'unknown';
 
@@ -153,6 +166,9 @@ Respond with a JSON array:
   }
 ]`;
 
-  const result = await model.generateContent(prompt);
+  const result = await withModelFallback(
+    (model) => model.generateContent(prompt),
+    { responseMimeType: 'application/json' }
+  );
   return JSON.parse(result.response.text());
 }

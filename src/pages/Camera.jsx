@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Camera,
   Upload,
@@ -15,6 +15,13 @@ import { analyzeFoodImage } from '../utils/gemini';
 import { addFoodEntry, getUserProfile } from '../utils/storage';
 
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Dessert'];
+
+function getMealTypeByTime() {
+  const hour = new Date().getHours();
+  if (hour >= 4 && hour < 11) return 'Breakfast';
+  if (hour >= 11 && hour < 16) return 'Lunch';
+  return 'Dinner';
+}
 
 function NutrientBadge({ label, value }) {
   return (
@@ -36,12 +43,20 @@ export default function CameraPage() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [showCamera, setShowCamera] = useState(false);
-  const [selectedMeal, setSelectedMeal] = useState('Lunch');
+  const [selectedMeal, setSelectedMeal] = useState(getMealTypeByTime);
   const [saved, setSaved] = useState(false);
   const [showNutrients, setShowNutrients] = useState(true);
   const [facingMode, setFacingMode] = useState('environment');
 
   const profile = getUserProfile();
+
+  useEffect(() => {
+    startCamera();
+
+    return () => {
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+    };
+  }, []);
 
   // Convert file to base64
   function fileToBase64(file) {
@@ -62,6 +77,7 @@ export default function CameraPage() {
   async function handleFileSelect(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    stopCamera();
     setError('');
     setResult(null);
     setSaved(false);
@@ -173,9 +189,9 @@ export default function CameraPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-24 ">
       {/* Header */}
-      <div className="bg-brand-darkest px-6 pt-12 pb-6">
+      <div className="bg-brand-darkest px-6 pt-12 pb-6 global-padding">
         <div className="flex items-center gap-2 mb-2">
           <Leaf size={20} className="text-brand-yellow" />
           <span className="text-white font-bold tracking-tight">NutriToday</span>
@@ -184,7 +200,14 @@ export default function CameraPage() {
         <p className="text-gray-400 text-sm mt-1">Snap or upload a photo to analyze nutrition</p>
       </div>
 
-      <div className="px-4 py-5 space-y-4 max-w-lg mx-auto">
+      <div className="px-4 py-5 space-y-4 w-full h-full mx-auto items-center justify-center">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileSelect}
+        />
 
         {/* Camera viewer */}
         {showCamera && (
@@ -194,7 +217,7 @@ export default function CameraPage() {
               autoPlay
               playsInline
               muted
-              className="w-full aspect-[4/3] object-cover"
+              className="w-full object-cover"
             />
             {/* Camera frame overlay */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -208,6 +231,13 @@ export default function CameraPage() {
                 <FlipHorizontal size={20} />
               </button>
               <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white"
+                aria-label="Upload food photo"
+              >
+                <Upload size={20} />
+              </button>
+              <button
                 onClick={capturePhoto}
                 className="w-16 h-16 bg-white rounded-full border-4 border-brand-yellow shadow-lg flex items-center justify-center active:scale-95 transition-transform"
               >
@@ -216,6 +246,7 @@ export default function CameraPage() {
               <button
                 onClick={stopCamera}
                 className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white"
+                aria-label="Close camera"
               >
                 <X size={20} />
               </button>
@@ -247,8 +278,8 @@ export default function CameraPage() {
               onClick={startCamera}
               className="flex flex-col items-center justify-center gap-2 bg-brand-darkest text-white py-8 rounded-2xl shadow active:scale-95 transition-transform"
             >
-              <Camera size={28} className="text-brand-yellow" />
-              <span className="text-sm font-medium">Take Photo</span>
+              <Camera size={128} className="text-brand-yellow" />
+              <span className="text-sm font-medium">Open Camera</span>
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
@@ -257,13 +288,6 @@ export default function CameraPage() {
               <Upload size={28} className="text-brand-mid" />
               <span className="text-sm font-medium">Upload Photo</span>
             </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileSelect}
-            />
           </div>
         )}
 

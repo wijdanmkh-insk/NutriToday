@@ -269,7 +269,7 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24 flex flex-col">
       {/* Header */}
-      <div className="bg-brand-darkest px-6 pt-12 pb-6">
+      <div className="bg-brand-darkest global-padding pt-12 pb-6 ">
         <div className="flex items-center gap-2 mb-2">
           <Leaf size={20} className="text-brand-yellow" />
           <span className="text-white font-bold tracking-tight">NutriToday</span>
@@ -279,7 +279,7 @@ export default function SearchPage() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-10 global-padding">
         <div className="flex overflow-x-auto no-scrollbar px-4 gap-1 py-3">
           {TABS.map((tab) => (
             <button

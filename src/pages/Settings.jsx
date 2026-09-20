@@ -126,39 +126,45 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="bg-brand-darkest px-6 pt-12 pb-8">
-        <div className="flex items-center gap-2 mb-2">
-          <Leaf size={20} className="text-brand-yellow" />
-          <span className="text-white font-bold tracking-tight">NutriToday</span>
-        </div>
-        <h1 className="text-white text-2xl font-bold">Settings</h1>
+      <div className="bg-brand-darkest px-6 pt-12 pb-8 global-padding">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Leaf size={20} className="text-brand-yellow" />
+              <span className="text-white font-bold tracking-tight">NutriToday</span>
+            </div>
+            <h1 className="text-white text-2xl font-bold">Settings</h1>
 
-        {/* Profile avatar */}
-        <div className="flex items-center gap-4 mt-5">
-          <div className="w-16 h-16 rounded-full bg-brand-mid flex items-center justify-center text-white text-2xl font-bold">
-            {profile.name.charAt(0).toUpperCase()}
+            {/* Profile avatar */}
+            <div className="flex items-center gap-4 mt-5">
+              <div className="w-16 h-16 rounded-full bg-brand-mid flex items-center justify-center text-white text-2xl font-bold">
+                {profile.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-white font-bold text-lg">{profile.name}</p>
+                <p className="text-gray-400 text-sm">{profile.gender} · {profile.age} years old</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-white font-bold text-lg">{profile.name}</p>
-            <p className="text-gray-400 text-sm">{profile.gender} · {profile.age} years old</p>
-          </div>
-        </div>
-      </div>
 
-      {/* Stats row */}
-      <div className="mx-4 -mt-4 bg-white rounded-2xl shadow-sm border border-gray-100 flex divide-x divide-gray-100">
-        <div className="flex-1 py-3 text-center">
-          <p className="text-gray-400 text-xs">Days</p>
-          <p className="text-brand-dark font-bold text-base mt-0.5">{elapsedDays}</p>
-        </div>
-        <div className="flex-1 py-3 text-center">
-          <p className="text-gray-400 text-xs">Meals Logged</p>
-          <p className="text-brand-dark font-bold text-base mt-0.5">{logCount}</p>
-        </div>
-        <div className="flex-1 py-3 text-center">
-          <p className="text-gray-400 text-xs">BMI</p>
-          <p className={`font-bold text-base mt-0.5 ${getBMIColor(bmi)}`}>{bmi}</p>
-          <p className={`text-xs ${getBMIColor(bmi)}`}>{getBMILabel(bmi)}</p>
+          {/* Stats row */}
+          <div className="flex gap-3 w-full md:w-auto">
+            <div className="flex-1 md:w-28 py-3 text-center rounded-2xl bg-white px-3 shadow-md">
+              <p className="text-gray-400 text-xs">Days</p>
+              <p className="text-brand-dark font-bold text-base mt-0.5">{elapsedDays}</p>
+            </div>
+
+            <div className="flex-1 md:w-28 py-3 text-center rounded-2xl bg-white px-3 shadow-md">
+              <p className="text-gray-400 text-xs">Meals Logged</p>
+              <p className="text-brand-dark font-bold text-base mt-0.5">{logCount}</p>
+            </div>
+
+            <div className="flex-1 md:w-28 py-3 text-center rounded-2xl bg-white px-3 shadow-md">
+              <p className="text-gray-400 text-xs">BMI</p>
+              <p className={`font-bold text-base mt-0.5 ${getBMIColor(bmi)}`}>{bmi}</p>
+              <p className={`text-xs ${getBMIColor(bmi)}`}>{getBMILabel(bmi)}</p>
+            </div>
+          </div>
         </div>
       </div>
 

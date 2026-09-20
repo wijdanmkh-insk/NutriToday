@@ -3,6 +3,7 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import CameraPage from './pages/Camera';
 import SearchPage from './pages/Search';
+import History from './pages/History';
 import Settings from './pages/Settings';
 import BottomNav from './components/BottomNav';
 import { getUserProfile } from './utils/storage';
@@ -68,6 +69,16 @@ export default function App() {
             <ProtectedRoute>
               <AppLayout>
                 <SearchPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <History />
               </AppLayout>
             </ProtectedRoute>
           }

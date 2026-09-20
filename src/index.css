@@ -7,3 +7,11 @@
   --color-brand-yellow: #fdc500;
   --color-brand-yellow-light: #ffd500;
 }
+
+.global-padding {
+  @apply px-8 md:px-16 lg:px-32;
+}
+
+html{
+  @apply text-lg;
+}

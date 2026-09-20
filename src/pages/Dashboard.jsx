@@ -110,39 +110,41 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="bg-brand-darkest px-6 pt-12 pb-8">
-        <div className="flex items-center gap-2 mb-6">
-          <Leaf size={20} className="text-brand-yellow" />
-          <span className="text-white font-bold tracking-tight">NutriToday</span>
-        </div>
-        <p className="text-gray-400 text-sm">{getGreeting()},</p>
-        <h1 className="text-white text-2xl font-bold mt-0.5">{profile.name} 👋</h1>
-
-        {/* Elapsed days pill */}
-        <div className="flex items-center gap-2 mt-4 bg-brand-dark rounded-xl px-4 py-3 w-fit">
-          <CalendarDays size={16} className="text-brand-yellow" />
-          <span className="text-white text-sm font-medium">
-            Day {elapsedDays} on NutriToday
-          </span>
-        </div>
-      </div>
-
-      {/* Stats bar */}
-      <div className="mx-4 -mt-4 bg-white rounded-2xl shadow-sm border border-gray-100 flex divide-x divide-gray-100">
-        {[
-          { label: 'Age', value: `${profile.age} yr` },
-          { label: 'Weight', value: `${profile.weight} kg` },
-          { label: 'Height', value: `${profile.height} cm` },
-        ].map(({ label, value }) => (
-          <div key={label} className="flex-1 py-3 text-center">
-            <p className="text-gray-400 text-xs">{label}</p>
-            <p className="text-brand-dark font-bold text-sm mt-0.5">{value}</p>
+      <div className="bg-brand-darkest global-padding pt-16 pb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:-mt-4 md:justify-between gap-6">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-6">
+              <Leaf size={20} className="text-brand-yellow" />
+              <span className="text-white font-bold tracking-tight">NutriToday</span>
+            </div>
+            <p className="text-gray-400 text-sm">{getGreeting()},</p>
+            <h1 className="text-white text-2xl font-bold mt-0.5">{profile.name} 👋</h1>
           </div>
-        ))}
+
+          <div className="flex gap-3 w-full md:w-auto">
+            {[
+              { label: 'Age', value: `${profile.age} yr` },
+              { label: 'Weight', value: `${profile.weight} kg` },
+              { label: 'Height', value: `${profile.height} cm` },
+            ].map(({ label, value }) => (
+              <div key={label} className="flex-1 md:w-28 py-5 text-center rounded-2xl bg-white px-3 shadow-md">
+                <p className="text-gray-400 text-xs">{label}</p>
+                <p className="text-brand-dark font-bold text-sm mt-0.5">{value}</p>
+              </div>
+            ))}
+
+            <div className="flex flex-row gap-2 md:w-28 py-5 text-center items-center rounded-2xl bg-brand-dark px-3 shadow-md">
+              <CalendarDays size={24} className="text-brand-yellow" />
+              <span className="text-white text-sm font-extrabold">
+                Day {elapsedDays}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Recommendations Section */}
-      <div className="px-4 mt-6">
+      <div className="mt-6 global-padding">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-gray-800 text-base">Today's Meal Plan</h2>
           <button
